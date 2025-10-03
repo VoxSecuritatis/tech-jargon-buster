@@ -1,0 +1,14 @@
+# Core app framework
+streamlit==1.39.0
+
+# OpenAI Python SDK
+openai==1.51.0
+
+# HTTP requests for Mistral and xAI APIs
+requests==2.32.3
+
+# Environment variable handling
+python-dotenv==1.0.1
+
+# Azure AI
+azure-ai-inference==1.0.0
