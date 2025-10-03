@@ -208,3 +208,5 @@ __marimo__/
 
 # Other junk
 package-lock.json
+.streamlit/*
+.toml

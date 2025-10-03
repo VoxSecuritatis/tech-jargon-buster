@@ -39,10 +39,10 @@ from azure.core.credentials import AzureKeyCredential
 # Load environment variables
 # ========================
 load_dotenv()
-GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
-
-if not GITHUB_TOKEN:
-    st.error("❌ Missing GITHUB_TOKEN in environment. Please set it in your .env file or Codespaces secrets.")
+# First try .env (local dev), then fall back to Streamlit secrets (cloud)
+GITHUB_API_KEY = os.getenv("GITHUB_API_KEY") or st.secrets.get("GITHUB_API_KEY")
+if not GITHUB_API_KEY:
+    st.error("❌ Missing GITHUB_TOKEN. Please set it in .env (local) or in Streamlit secrets (cloud).")
     st.stop()
 
 # ========================
