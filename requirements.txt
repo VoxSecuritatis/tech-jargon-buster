@@ -11,4 +11,4 @@ requests==2.32.3
 python-dotenv==1.0.1
 
 # Azure AI
-azure-ai-inference==1.0.0
+azure-ai-inference==1.0.0b9
