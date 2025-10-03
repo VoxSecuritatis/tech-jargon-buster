@@ -6,7 +6,7 @@ A Streamlit-based chatbot that translates IT jargon into beginner-friendly langu
 
 Developed by: Brock Frary
 Date: 2025-10-02
-Version: 0.3.0
+Version: 0.5.0
 
 Attribution:
 This project was developed as part of personal learning and portfolio building.
@@ -57,8 +57,8 @@ GITHUB_MISTRAL_ENDPOINT = "https://models.github.ai/inference"
 GITHUB_MISTRAL_MODEL = "mistral-small-2503"
 
 # xAI Grok
-GROK_ENDPOINT = "https://api.x.ai/v1/chat/completions"
-GROK_MODEL = "grok-3"
+GITHUB_GROK_ENDPOINT = "https://models.github.ai/inference"
+GITHUB_GROK_MODEL = "xai/grok-3"
 
 # ========================
 # Streamlit UI
@@ -81,7 +81,7 @@ st.markdown(
 
 user_input = st.text_input("Enter an IT jargon term:")
 # Add slider for temperature
-temperature = st.slider(
+slider_temperature = st.slider(
     "Creativity (temperature)",
     min_value=0.0,
     max_value=1.5,
@@ -96,9 +96,14 @@ submit = st.button("Explain")
 # Helper: Simple IT check
 # ========================
 IT_KEYWORDS = [
-    "server", "api", "protocol", "firewall", "cloud", "database",
-    "python", "encryption", "router", "algorithm", "token", "hash"
+    "firewall", "router", "switch", "vpn", "ids", "ips", "siem", "soar", "mfa",
+    "sso", "oidc", "saml", "ssl", "tls", "dns", "dhcp", "http", "https", "api",
+    "sdk", "json", "xml", "html", "css", "javascript", "python", "java", "c++",
+    "docker", "kubernetes", "vmware", "hypervisor", "cloud", "aws", "azure",
+    "gcp", "linux", "windows", "unix", "kernel", "sql", "nosql", "mongodb",
+    "postgresql", "mysql", "ssh", "ftp", "smtp", "imap", "oauth", "rest"
 ]
+
 
 def is_it_term(term: str) -> bool:
     """Check if a term is IT-related by matching keywords."""
@@ -108,7 +113,7 @@ def is_it_term(term: str) -> bool:
 # ========================
 # GitHub Models GPT-4.1 Connector
 # ========================
-def call_github_gpt(term: str) -> str:
+def call_github_gpt(term: str, temperature: float) -> str:
     """Call GitHub Models GPT-4.1 endpoint to explain IT jargon."""
     headers = {
         "Authorization": f"Bearer {GITHUB_TOKEN}",
@@ -120,7 +125,7 @@ def call_github_gpt(term: str) -> str:
             {"role": "system", "content": "You are an IT jargon explainer. Keep responses beginner-friendly."},
             {"role": "user", "content": f"Explain the IT jargon term '{term}' in simple language with a real-world analogy."}
         ],
-        "temperature": 0.7
+        "temperature": temperature
     }
     try:
         resp = requests.post(GITHUB_GPT_ENDPOINT, headers=headers, json=payload, timeout=30)
@@ -129,10 +134,11 @@ def call_github_gpt(term: str) -> str:
     except Exception as e:
         return f"❌ Error calling GitHub Models GPT-4.1: {e}"
 
+
 # ========================
-# GitHub Models Mistral 3B Connector
+# GitHub Models Mistral Small 3.1 Connector
 # ========================
-def call_github_mistral(term: str) -> str:
+def call_github_mistral(term: str, temperature: float) -> str:
     """Call GitHub Models Mistral Small 3.1 using Azure AI Inference SDK."""
     try:
         client = ChatCompletionsClient(
@@ -145,7 +151,7 @@ def call_github_mistral(term: str) -> str:
                 SystemMessage("You are an IT jargon explainer. Keep responses beginner-friendly."),
                 UserMessage(f"Explain the IT jargon term '{term}' with real-world analogies.")
             ],
-            temperature=0.7,
+            temperature=temperature,
             top_p=1.0,
             max_tokens=500,
             model="mistral-ai/mistral-small-2503"
@@ -156,30 +162,33 @@ def call_github_mistral(term: str) -> str:
     except Exception as e:
         return f"❌ Error calling GitHub Models Mistral Small 3.1: {e}"
 
-# ========================
-# xAI Grok Connector
-# ========================
-def call_grok(term: str) -> str:
-    if not GROK_TOKEN:
-        return "⚠️ xAI Grok integration unavailable (missing GROK_API_KEY)."
 
-    headers = {
-        "Authorization": f"Bearer {GROK_TOKEN}",
-        "Content-Type": "application/json"
-    }
-    payload = {
-        "model": GROK_MODEL,
-        "messages": [
-            {"role": "system", "content": "Explain IT jargon in plain, beginner-friendly language."},
-            {"role": "user", "content": f"Explain '{term}' with examples and analogies."}
-        ]
-    }
+# ========================
+# GitHub Models xAI Grok-3 Connector
+# ========================
+def call_grok(term: str, temperature: float) -> str:
+    """Call GitHub Models xAI Grok-3 using Azure AI Inference SDK."""
     try:
-        resp = requests.post(GROK_ENDPOINT, headers=headers, json=payload, timeout=30)
-        resp.raise_for_status()
-        return resp.json()["choices"][0]["message"]["content"].strip()
+        client = ChatCompletionsClient(
+            endpoint=GITHUB_GROK_ENDPOINT,
+            credential=AzureKeyCredential(GITHUB_TOKEN),
+        )
+
+        response = client.complete(
+            messages=[
+                SystemMessage("You are an IT jargon explainer. Keep responses beginner-friendly."),
+                UserMessage(f"Explain the IT jargon term '{term}' with examples and analogies.")
+            ],
+            temperature=temperature,
+            top_p=1.0,
+            max_tokens=500,
+            model=GITHUB_GROK_MODEL
+        )
+
+        return response.choices[0].message.content
+
     except Exception as e:
-        return f"❌ Error calling xAI Grok-3: {e}"
+        return f"❌ Error calling GitHub Models xAI Grok-3: {e}"
 
 # ========================
 # Main Logic
@@ -190,7 +199,7 @@ if submit:
         term = user_input.replace("TERM:", "").strip()
     else:
         if not is_it_term(user_input):
-            st.warning("⚠️ The term entered is not considered a known IT term. Try again, or override with TERM:.")
+            st.warning("⚠️ The term entered is not considered a known IT term. Try again, or override with TERM:. For example:  TERM:FTP")
             st.stop()
         term = user_input.strip()
 
@@ -204,15 +213,15 @@ if submit:
 
     with col1:
         st.subheader("GitHub Models GPT-4.1")
-        st.write(call_github_gpt(term))
+        st.write(call_github_gpt(term, slider_temperature))
 
     with col2:
         st.subheader("GitHub Models Mistral Small 3.1")
-        st.write(call_github_mistral(term))
+        st.write(call_github_mistral(term, slider_temperature))
 
     with col3:
         st.subheader("xAI Grok-3")
-        st.write(call_grok(term))
+        st.write(call_grok(term, slider_temperature))
 
 
 
