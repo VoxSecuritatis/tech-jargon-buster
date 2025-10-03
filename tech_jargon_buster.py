@@ -163,7 +163,7 @@ def call_github_mistral(term: str, temperature: float) -> str:
         return f"❌ Error calling GitHub Models Mistral Small 3.1: {e}"
 
 
-# ========================
+# =======================
 # GitHub Models xAI Grok-3 Connector
 # ========================
 def call_grok(term: str, temperature: float) -> str:
