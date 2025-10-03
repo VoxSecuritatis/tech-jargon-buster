@@ -142,6 +142,7 @@ Open the URL shown (usually http://localhost:8501).
    ```
 4. **Deploy**.
 
+Streamlit version:  https://tech-jargon-buster.streamlit.app
 ---
 
 ## 💡 How to Use
