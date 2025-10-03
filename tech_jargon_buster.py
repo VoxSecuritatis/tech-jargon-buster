@@ -42,7 +42,7 @@ load_dotenv()
 # First try .env (local dev), then fall back to Streamlit secrets (cloud)
 GITHUB_API_KEY = os.getenv("GITHUB_API_KEY") or st.secrets.get("GITHUB_API_KEY")
 if not GITHUB_API_KEY:
-    st.error("❌ Missing GITHUB_TOKEN. Please set it in .env (local) or in Streamlit secrets (cloud).")
+    st.error("❌ Missing GITHUB_API_KEY. Please set it in .env (local) or in Streamlit secrets (cloud).")
     st.stop()
 
 # ========================
@@ -116,7 +116,7 @@ def is_it_term(term: str) -> bool:
 def call_github_gpt(term: str, temperature: float) -> str:
     """Call GitHub Models GPT-4.1 endpoint to explain IT jargon."""
     headers = {
-        "Authorization": f"Bearer {GITHUB_TOKEN}",
+        "Authorization": f"Bearer {GITHUB_API_KEY}",
         "Content-Type": "application/json"
     }
     payload = {
@@ -143,7 +143,7 @@ def call_github_mistral(term: str, temperature: float) -> str:
     try:
         client = ChatCompletionsClient(
             endpoint="https://models.github.ai/inference",
-            credential=AzureKeyCredential(GITHUB_TOKEN),
+            credential=AzureKeyCredential(GITHUB_API_KEY),
         )
 
         response = client.complete(
@@ -171,7 +171,7 @@ def call_grok(term: str, temperature: float) -> str:
     try:
         client = ChatCompletionsClient(
             endpoint=GITHUB_GROK_ENDPOINT,
-            credential=AzureKeyCredential(GITHUB_TOKEN),
+            credential=AzureKeyCredential(GITHUB_API_KEY),
         )
 
         response = client.complete(
