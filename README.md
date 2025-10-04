@@ -1,4 +1,8 @@
-# Tech Jargon Buster
+# Repository: Tech Jargon Buster
+Published: 2025-10-02 | Updated: 2025-10-04
+
+## Project page:  https://github.com/VoxSecuritatis/Project-AI-tech-jargon-buster
+
 
 A **Streamlit** app that translates IT jargon into beginner-friendly explanations with real-world analogies.  
 It queries **multiple LLMs via GitHub Models** to give side-by-side answers.
