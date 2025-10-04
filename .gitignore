@@ -210,3 +210,4 @@ __marimo__/
 package-lock.json
 .streamlit/*
 .toml
+helper_files/*

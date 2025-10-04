@@ -141,6 +141,14 @@ def call_github_gpt(term: str, temperature: float) -> str:
 def call_github_mistral(term: str, temperature: float) -> str:
     """Call GitHub Models Mistral Small 3.1 using Azure AI Inference SDK."""
     try:
+        # --------- SAFETY GUARD ----------
+        # Cap temperature within 0.0–1.0 since Mistral rejects higher values
+        safe_temp = min(max(temperature, 0.0), 1.0)
+
+        # Notify user if their chosen temperature exceeded Mistral's limit
+        if temperature > 1.0:
+            st.info("⚠️ Mistral model supports up to temperature 1.0 — adjusted automatically.")
+
         client = ChatCompletionsClient(
             endpoint="https://models.github.ai/inference",
             credential=AzureKeyCredential(GITHUB_API_KEY),
@@ -151,7 +159,7 @@ def call_github_mistral(term: str, temperature: float) -> str:
                 SystemMessage("You are an IT jargon explainer. Keep responses beginner-friendly."),
                 UserMessage(f"Explain the IT jargon term '{term}' with real-world analogies.")
             ],
-            temperature=temperature,
+            temperature=safe_temp,
             top_p=1.0,
             max_tokens=500,
             model="mistral-ai/mistral-small-2503"
