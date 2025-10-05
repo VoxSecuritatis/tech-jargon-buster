@@ -1,7 +1,7 @@
 # Repository: Tech Jargon Buster
 Published: 2025-10-02 | Updated: 2025-10-04
 
-### Project page:  https://github.com/VoxSecuritatis/Project-AI-tech-jargon-buster
+#### Project page:  [Project page](https://github.com/VoxSecuritatis/Project-AI-tech-jargon-buster)
 - Project page contains a 'Development timeline' of screenshots including the final UI if the Streamlit cloud app does not work (i.e., an API key restriction, rate limiting, etc.)
 
 A **Streamlit** app that translates IT jargon into beginner-friendly explanations with real-world analogies.  
