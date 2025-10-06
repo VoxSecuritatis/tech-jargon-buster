@@ -1,4 +1,3 @@
-# tech_jargon_buster.py
 """
 Tech Jargon Buster
 ------------------
