@@ -48,15 +48,15 @@ if not GITHUB_API_KEY:
 # ========================
 # API Endpoints + Models
 # ========================
-# GitHub Models (ChatGPT equivalent)
+# GitHub Models - ChatGPT
 GITHUB_GPT_ENDPOINT = "https://models.inference.ai.azure.com/openai/deployments/gpt-4.1/chat/completions"
 GITHUB_GPT_MODEL = "gpt-4.1"
 
-# GitHub Models (Mistral Small)
+# GitHub Models - Mistral Small
 GITHUB_MISTRAL_ENDPOINT = "https://models.github.ai/inference"
 GITHUB_MISTRAL_MODEL = "mistral-small-2503"
 
-# xAI Grok
+# GitHub Models -  xAI Grok
 GITHUB_GROK_ENDPOINT = "https://models.github.ai/inference"
 GITHUB_GROK_MODEL = "xai/grok-3"
 
@@ -77,7 +77,6 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
-
 
 user_input = st.text_input("Enter an IT jargon term:")
 # Add slider for temperature
@@ -104,14 +103,13 @@ IT_KEYWORDS = [
     "postgresql", "mysql", "ssh", "ftp", "smtp", "imap", "oauth", "rest"
 ]
 
-
 def is_it_term(term: str) -> bool:
     """Check if a term is IT-related by matching keywords."""
     term_lower = term.lower()
     return any(word in term_lower for word in IT_KEYWORDS)
 
 # ========================
-# GitHub Models GPT-4.1 Connector
+# GitHub Models ChatGPT-4.1 Connector
 # ========================
 def call_github_gpt(term: str, temperature: float) -> str:
     """Call GitHub Models GPT-4.1 endpoint to explain IT jargon."""
@@ -133,7 +131,6 @@ def call_github_gpt(term: str, temperature: float) -> str:
         return resp.json()["choices"][0]["message"]["content"].strip()
     except Exception as e:
         return f"❌ Error calling GitHub Models GPT-4.1: {e}"
-
 
 # ========================
 # GitHub Models Mistral Small 3.1 Connector
@@ -169,7 +166,6 @@ def call_github_mistral(term: str, temperature: float) -> str:
 
     except Exception as e:
         return f"❌ Error calling GitHub Models Mistral Small 3.1: {e}"
-
 
 # =======================
 # GitHub Models xAI Grok-3 Connector
@@ -230,9 +226,5 @@ if submit:
     with col3:
         st.subheader("xAI Grok-3")
         st.write(call_grok(term, slider_temperature))
-
-
-
-
 
 # © 2025 Brock Frary. All rights reserved.
